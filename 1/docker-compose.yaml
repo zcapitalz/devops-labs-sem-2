@@ -1,0 +1,14 @@
+name: devops-lab1
+
+services:
+  nginx:
+    restart: no
+    build:
+      context: .
+      args:
+        NGINX_VERSION: "1.27.4"
+    volumes:
+      - ./assets:/var/www/devops:ro
+      - ./nginx.conf:/etc/nginx/nginx.conf:ro
+    ports:
+      - '81:81'
