@@ -1,0 +1,19 @@
+FROM golang:1.22.3-alpine
+
+WORKDIR /app
+
+COPY go.mod go.sum ./
+RUN go mod download
+
+COPY internal ./internal
+COPY cmd ./cmd
+RUN GOOS=linux go build -a -o server cmd/app/main.go
+
+RUN go clean -modcache
+
+COPY config ./config
+COPY migrations ./migrations
+
+EXPOSE ${HTTP_SERVER_PORT}
+
+CMD ["./server"]
