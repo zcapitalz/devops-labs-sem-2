@@ -1,4 +1,4 @@
-FROM alpine/git:v2.47.2
+FROM alpine/git:v2.47.2 as builder
 
 ARG NGINX_VERSION
 
@@ -6,8 +6,9 @@ RUN apk upgrade --no-cache
 
 RUN apk add --no-cache wget build-base pcre pcre-dev zlib zlib-dev openssl-dev gd-dev libxml2 libxml2-dev util-linux-dev
 
-RUN wget http://nginx.org/download/nginx-${NGINX_VERSION}.tar.gz
-RUN tar -zxvf nginx-${NGINX_VERSION}.tar.gz -C /
+RUN wget http://nginx.org/download/nginx-${NGINX_VERSION}.tar.gz && \
+    tar -zxvf nginx-${NGINX_VERSION}.tar.gz -C / && \
+    rm nginx-${NGINX_VERSION}.tar.gz
 
 WORKDIR /nginx-${NGINX_VERSION}
 ARG NGINX_CONFIG_DIR=/etc/nginx
@@ -17,7 +18,19 @@ RUN ./configure --prefix=/var/www/html --sbin-path=/usr/sbin/nginx --conf-path=$
 RUN make
 RUN make install
 
+FROM alpine:latest
+
+ARG NGINX_VERSION
+
+COPY --from=builder /usr/sbin/nginx /usr/sbin/nginx
+COPY --from=builder /etc/nginx /etc/nginx
+COPY --from=builder /var/log/nginx /var/log/nginx
+COPY --from=builder /var/www/html /var/www/html
 RUN rm /etc/nginx/nginx.conf
+
+RUN apk add --no-cache pcre zlib openssl gd libxml2 util-linux
+
+
 COPY ./entrypoint.sh /
 
 ENTRYPOINT ["/entrypoint.sh"]
