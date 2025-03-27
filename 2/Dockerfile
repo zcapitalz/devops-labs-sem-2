@@ -9,7 +9,7 @@ COPY internal ./internal
 COPY cmd ./cmd
 RUN GOOS=linux go build -a -o server cmd/app/main.go
 
-FROM alpine:latest
+FROM alpine:3.21.3
 
 WORKDIR /app
 COPY --from=builder app/server .

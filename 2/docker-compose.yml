@@ -1,6 +1,7 @@
 services:
 
   server:
+    image: auth-server
     container_name: auth-service
     build:
       context: "./${REPO_DIR_NAME}"
@@ -15,13 +16,18 @@ services:
       - db
 
   db:
-      container_name: auth-service-postgres
-      image: 'postgres:16'
-      restart: always
-      environment:
-        POSTGRES_PORT: ${DB_PORT}
-        POSTGRES_DB: ${DB_NAME}
-        POSTGRES_USER: ${DB_USERNAME}
-        POSTGRES_PASSWORD: ${DB_PASSWORD}
-      ports:
-        - '${DB_PORT}:${DB_PORT}'
+    container_name: auth-service-postgres
+    image: 'postgres:16'
+    restart: always
+    environment:
+      POSTGRES_PORT: ${DB_PORT}
+      POSTGRES_DB: ${DB_NAME}
+      POSTGRES_USER: ${DB_USERNAME}
+      POSTGRES_PASSWORD: ${DB_PASSWORD}
+    ports:
+      - '${DB_PORT}:${DB_PORT}'
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME} -d ${DB_NAME}"]
+      interval: 1s
+      timeout: 3s
+      retries: 5
