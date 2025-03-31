@@ -1,0 +1,10 @@
+FROM devops-labs-system:latest
+
+WORKDIR /app
+
+COPY go.mod go.sum ./
+RUN go mod download
+
+COPY internal ./internal
+COPY cmd ./cmd
+RUN GOOS=linux go build -a -o server cmd/app/main.go
