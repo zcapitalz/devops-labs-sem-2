@@ -1,12 +1,14 @@
 services:
   base-system-image:
     image: devops-labs-system
+    profiles: ["build"]
     build:
       context: .
       dockerfile: Dockerfile.system
 
   server-build-image:
     image: auth-server-build
+    profiles: ["build"]
     build:
       context: "./${REPO_DIR_NAME}"
       dockerfile: Dockerfile.build
@@ -15,9 +17,9 @@ services:
 
   server:
     image: auth-server
-    container_name: auth-service
     build:
       context: "./${REPO_DIR_NAME}"
+    container_name: auth-service
     restart: always
     volumes:
       - "./${REPO_DIR_NAME}/migrations:/app/migrations"
@@ -28,7 +30,6 @@ services:
     ports:
       - ${HTTP_SERVER_PORT}:${HTTP_SERVER_PORT}
     depends_on:
-      - server-build-image
       - db
 
   db:
