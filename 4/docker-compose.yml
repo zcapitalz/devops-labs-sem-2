@@ -1,19 +1,10 @@
 services:
-  base-system-image:
-    image: devops-labs-system
-    profiles: ["build"]
-    build:
-      context: .
-      dockerfile: Dockerfile.system
-
   server-build-image:
     image: auth-server-build
     profiles: ["build"]
     build:
       context: "./${REPO_DIR_NAME}"
       dockerfile: Dockerfile.build
-    depends_on:
-      - base-system-image
 
   server:
     image: auth-server

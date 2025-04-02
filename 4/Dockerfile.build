@@ -1,4 +1,4 @@
-FROM devops-labs-system:latest
+FROM golang:1.22.3-alpine
 
 WORKDIR /app
 
@@ -8,3 +8,5 @@ RUN go mod download
 COPY internal ./internal
 COPY cmd ./cmd
 RUN GOOS=linux go build -a -o server cmd/app/main.go
+
+COPY migrations ./migrations
