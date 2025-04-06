@@ -1,0 +1,63 @@
+services:
+  frontend:
+    image: hobbie-frontend
+    build:
+      context: "$FRONTEND_DIR"
+    volumes:
+      - "hobbie-frontend-build:/app/build:ro"
+
+  nginx-proxy:
+    image: nginx:1.27.4-alpine
+    container_name: hobbie-nginx-proxy
+    ports:
+      - "${NGINX_PORT}:80"
+    volumes:
+      - "${NGINX_CONFIG_PATH}:/etc/nginx/conf.d/default.conf"
+      - "hobbie-frontend-build:/usr/share/nginx/html:ro"
+    depends_on:
+      - frontend
+      - backend
+    networks:
+      - backend
+
+  backend:
+    image: hobbie-server
+    build:
+      context: "$BACKEND_DIR"
+    container_name: hobbie-server
+    hostname: "$BACKEND_HOST"
+    restart: no
+    environment:
+      SERVER_PORT: "$SERVER_PORT"
+      DB_HOST: "$DB_HOST"
+      DB_PORT: "$DB_PORT"
+      DB_NAME: "$DB_NAME"
+      DB_USER: "$DB_USER"
+      DB_PASSWORD: "$DB_PASSWORD"
+    volumes:
+      - "${BACKEND_CONFIG_PATH}:/config/application.properties:ro"
+    depends_on:
+      - db
+    networks:
+      - backend
+
+  db:
+    container_name: hobbie-mysql
+    hostname: "$DB_HOST"
+    image: mysql:8.0
+    environment:
+      MYSQL_DATABASE: "$DB_NAME"
+      MYSQL_USER: "$DB_USER"
+      MYSQL_PASSWORD: "$DB_PASSWORD"
+      MYSQL_ROOT_PASSWORD: "$DB_ROOT_PASSWORD"
+    volumes:
+      - "hobbie-mysql-data:/var/lib/mysql"
+    networks:
+      - backend
+
+networks:
+  backend:
+
+volumes:
+  hobbie-frontend-build:
+  hobbie-mysql-data:
