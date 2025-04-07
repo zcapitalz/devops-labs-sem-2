@@ -52,6 +52,7 @@ echo "NGINX_PORT=${backend_external_port}" >> "$compose_env_path"
 echo "NGINX_CONFIG_PATH=${nginx_config_path}" >> "$compose_env_path"
 
 echo "BACKEND_DIR=${backend_dir}" >> "$compose_env_path"
+echo "BACKEND_PORT=${backend_internal_port}" >> "$compose_env_path"
 echo "BACKEND_HOST=${backend_internal_host}" >> "$compose_env_path"
 echo "BACKEND_CONFIG_PATH=${backend_config_path}" >> "$compose_env_path"
 
