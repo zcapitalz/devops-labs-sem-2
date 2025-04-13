@@ -1,0 +1,9 @@
+services:
+  gitlab-runner:
+    image: "gitlab/gitlab-runner:${GITLAB_RUNNER_IMAGE_TAG}"
+    container_name: gitlab-runner
+    volumes:
+      - "${GITLAB_RUNNER_DIR}/config:/etc/gitlab-runner"
+      - /var/run/docker.sock:/var/run/docker.sock
+      - "${GITLAB_RUNNER_CONFIG}:/etc/gitlab-runner/config.toml"
+    network_mode: host

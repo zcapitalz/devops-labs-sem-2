@@ -1,0 +1,35 @@
+concurrent = 1
+check_interval = 0
+connection_max_age = "15m0s"
+shutdown_timeout = 0
+
+[session_server]
+  session_timeout = 1800
+
+[[runners]]
+  name = "runner1"
+  url = "http://172.17.0.1:8929"
+  id = 1
+  token = "{{ runner_token }}"
+  token_obtained_at = 2025-04-13T16:46:01Z
+  token_expires_at = 0001-01-01T00:00:00Z
+  executor = "docker"
+  [runners.cache]
+    MaxUploadedArchiveSize = 0
+    [runners.cache.s3]
+    [runners.cache.gcs]
+    [runners.cache.azure]
+  [runners.store]
+    [runners.store.file]
+  [runners.docker]
+    tls_verify = false
+    image = "alpine:3.21.3"
+    helper_image = "{{ runner_helper_image }}"
+    privileged = true
+    disable_entrypoint_overwrite = false
+    oom_kill_disable = false
+    disable_cache = false
+    volumes = ["/cache","/var/run/docker.sock:/var/run/docker.sock"]
+    shm_size = 0
+    network_mtu = 0
+    network_mode = "host"
