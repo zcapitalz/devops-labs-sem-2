@@ -1,0 +1,61 @@
+services:
+  frontend:
+    image: "docker.io/zcapital/react-spring-app-frontend:${IMAGE_TAG}"
+    volumes:
+      - "hobbie-frontend-build:/app/build:ro"
+
+  nginx-proxy:
+    image: nginx:1.27.4-alpine
+    container_name: hobbie-nginx-proxy
+    ports:
+      - "${NGINX_PORT}:80"
+    volumes:
+      - "hobbie-frontend-build:/usr/share/nginx/html:ro"
+    depends_on:
+      - frontend
+      - backend
+    networks:
+      - backend
+
+  backend:
+    image: "docker.io/zcapital/react-spring-app-backend:${IMAGE_TAG}"
+    container_name: hobbie-server
+    hostname: "backend"
+    restart: always
+    environment:
+      SERVER_PORT: "8080"
+      DB_HOST: "$DB_HOST"
+      DB_PORT: "$DB_PORT"
+      DB_NAME: "$DB_NAME"
+      DB_USER: "$DB_USER"
+      DB_PASSWORD: "$DB_PASSWORD"
+    depends_on:
+      - db
+    networks:
+      - backend
+
+  db:
+    container_name: hobbie-mysql
+    hostname: "$DB_HOST"
+    image: mysql:8.0
+    environment:
+      MYSQL_DATABASE: "$DB_NAME"
+      MYSQL_USER: "$DB_USER"
+      MYSQL_PASSWORD: "$DB_PASSWORD"
+      MYSQL_ROOT_PASSWORD: "$DB_ROOT_PASSWORD"
+    volumes:
+      - "hobbie-mysql-data:/var/lib/mysql"
+    networks:
+      - backend
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 3s
+      timeout: 5s
+      retries: 10
+
+networks:
+  backend:
+
+volumes:
+  hobbie-frontend-build:
+  hobbie-mysql-data:
