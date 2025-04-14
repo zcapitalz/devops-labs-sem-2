@@ -37,7 +37,8 @@ services:
     volumes:
       - "${BACKEND_CONFIG_PATH}:/config/application.properties:ro"
     depends_on:
-      - db
+      db:
+        condition: service_healthy
     networks:
       - backend
 
@@ -54,9 +55,15 @@ services:
       - "hobbie-mysql-data:/var/lib/mysql"
     networks:
       - backend
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 3s
+      timeout: 5s
+      retries: 10
 
 networks:
   backend:
+    name: hobbie-network
 
 volumes:
   hobbie-frontend-build:
